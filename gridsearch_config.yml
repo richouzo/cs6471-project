@@ -1,0 +1,26 @@
+hyperparameters:
+  # Training
+  model_type: ['BasicLSTM']
+  optimizer_type: ['adam']
+  loss_criterion: ['bcelosswithlogits']
+  lr: [0.001]
+  epochs: [10]
+  batch_size: [64]
+  patience_es: [5]
+
+  # Scheduler
+  scheduler_type: ['']
+  patience_lr: [3]
+
+  # Saving condition by acc or loss
+  save_condition: ['acc']
+
+  # HybridLSTMCNN
+  fix_length: [null]
+
+  # PyramidCNN
+  context_size: [0]
+  pyramid: [[256,256]]
+  fcs: [[128]]
+  batch_norm: [0]
+  alpha: [0.2]
