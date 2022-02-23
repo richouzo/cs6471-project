@@ -193,7 +193,7 @@ def create_fields_dataset(model_type, fix_length=None, module_path='', dataset_n
     train_data, val_data = TabularDataset.splits(
         path = '',
         train=module_path+dict_dataset_name[dataset_name]['train'],
-        test=module_path+dict_dataset_name[dataset_name]['test'],
+        test=module_path+dict_dataset_name[dataset_name]['val'],
         format='csv',
         fields=fields,
         skip_header=True,
