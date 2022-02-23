@@ -127,21 +127,6 @@ def format_test_file(text_file_testset, text_file_labels, module_path='', datase
                     message += line[i]
                 tweets_test.append(message)
                 y_test.append(line[4])
-        for line in open(module_path+text_file_labels,'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split(',')
-            offensive = set(['1', '1.0', '0', '0.0'])
-            if len(line) >= 18 and line[4] in offensive:
-                message = ""
-                for i in range(14, len(line) - 3):
-                    message += line[i]
-                tweets_test.append(message)
-                y_test.append(line[4])
         return tweets_test[1:], y_test[1:]
             
 
