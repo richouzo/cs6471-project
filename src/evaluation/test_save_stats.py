@@ -4,6 +4,7 @@ import argparse
 
 import numpy as np
 import pandas as pd
+from src.utils.preprocess_utils import create_formatted_csvs
 
 from src.utils.utils import STATS_CSV
 
@@ -137,6 +138,7 @@ if __name__ == '__main__':
             device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         print("Device:", device)
 
+        create_formatted_csvs(training_data, testset_data)
         field, tokenizer, train_data, val_data, test_data = get_datasets(training_data, testset_data, test_labels_data, model_type, fix_length)
         dataloaders = get_dataloaders(train_data, val_data, test_data, batch_size, device)
 
