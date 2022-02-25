@@ -57,23 +57,7 @@ def format_training_file(dataset_name='', module_path=''):
         pass
 
     elif dataset_name == 'SBF':
-        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split(',')
-            offensive = set(['1', '1.0', '0', '0.0'])
-            if len(line) >= 18 and line[4] in offensive:
-                message = ""
-                for i in range(14, len(line) - 3):
-                    message += line[i]
-                tweets.append(message)
-                classes.append(line[4])
-
-    elif dataset_name == 'implicithate':
+        offensive = set(['1', '1.0', '0', '0.0'])
         for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
@@ -82,11 +66,26 @@ def format_training_file(dataset_name='', module_path=''):
             line = re.sub(r'(:.*?:)', r' \1 ', line)
             line = re.sub(' +', ' ', line)
             line = line.rstrip('\n').split('\t')
-            hate_labels = set(['implicit_hate', 'explicit_hate'])
+            if len(line) >= 18 and line[5] in offensive:
+                message = "".join(line[i] for i in range(15, len(line) - 4))
+                tweets.append(message)
+                classes.append(line[5])
+
+    elif dataset_name == 'implicithate':
+        hate_labels = set(['implicit_hate', 'explicit_hate'])
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
+            line = re.sub(r'#([^ ]*)', r'\1', line)
+            line = re.sub(r'https.*[^ ]', 'URL', line)
+            line = re.sub(r'http.*[^ ]', 'URL', line)
+            line = emoji.demojize(line)
+            line = re.sub(r'(:.*?:)', r' \1 ', line)
+            line = re.sub(' +', ' ', line)
+            line = line.rstrip('\n').split('\t')
             if len(line) >= 3:
                 tweets.append(line[1])
                 classes.append(int(line[2] in hate_labels))
 
+    # print("length of tweets, classes", len(tweets), len(classes))
     return tweets[1:], classes[1:]
 
 def train_val_split_tocsv(tweets, classes, val_size=0.2, module_path='', dataset_name=''):
@@ -95,8 +94,11 @@ def train_val_split_tocsv(tweets, classes, val_size=0.2, module_path='', dataset
     df_train = pd.DataFrame({'text': tweets_train, 'label': y_train})
     df_val = pd.DataFrame({'text': tweets_val, 'label': y_val})
 
-    df_train.to_csv(module_path+dict_dataset_name_processed[dataset_name]['train'], index=False)
-    df_val.to_csv(module_path+dict_dataset_name_processed[dataset_name]['val'], index=False)
+    train_csv_name = module_path+dict_dataset_name_processed[dataset_name]['train']
+    val_csv_name = module_path+dict_dataset_name_processed[dataset_name]['val']
+    df_train.to_csv(train_csv_name, index=False)
+    df_val.to_csv(val_csv_name, index=False)
+    return (train_csv_name, val_csv_name)
 
 def format_test_file(dataset_name='', module_path=''):
     # TODO Remove this function and preprocess the datasets to tsv before the training pipeline
@@ -128,14 +130,14 @@ def format_test_file(dataset_name='', module_path=''):
             line = emoji.demojize(line)
             line = re.sub(r'(:.*?:)', r' \1 ', line)
             line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split(',')
+            line = line.rstrip('\n').split('\t')
             offensive = set(['1', '1.0', '0', '0.0'])
-            if len(line) >= 18 and line[4] in offensive:
+            if len(line) >= 18 and line[5] in offensive:
                 message = ""
-                for i in range(14, len(line) - 3):
+                for i in range(15, len(line) - 4):
                     message += line[i]
                 tweets_test.append(message)
-                y_test.append(line[4])
+                y_test.append(line[5])
         return tweets_test[1:], y_test[1:]
 
     elif dataset_name == 'implicithate':
@@ -157,7 +159,9 @@ def format_test_file(dataset_name='', module_path=''):
 
 def test_tocsv(tweets_test, y_test, module_path='', dataset_name = ''):
     df_test = pd.DataFrame({'text': tweets_test, 'label': y_test})
-    df_test.to_csv(module_path+dict_dataset_name_processed[dataset_name]['test'], index=False)
+    test_csv_name = module_path+dict_dataset_name_processed[dataset_name]['test']
+    df_test.to_csv(test_csv_name, index=False)
+    return test_csv_name
 
 def create_fields_dataset(model_type, fix_length=None, module_path='', train_dataset_name='', test_dataset_name=''):
     tokenizer = None
@@ -213,23 +217,19 @@ def create_iterators(train_data, test_data, batch_size, dev, shuffle=False):
     return train_iterator, test_iterator
 
 def get_vocab_stoi_itos(field, tokenizer=None):
-    if tokenizer is not None:
-        vocab_stoi = tokenizer.encode
-        vocab_itos = tokenizer.decode
-    else:
-        vocab_stoi = field.vocab.stoi
-        vocab_itos = field.vocab.itos
-    return (vocab_stoi, vocab_itos)
+    return (tokenizer.encode, tokenizer.encode) if tokenizer else (field.vocab.stoi, field.vocab.itos)
 
-def get_datasets(train_dataset_name, test_dataset_name, model_type, fix_length=None, module_path=''):
+def create_formatted_csvs(train_dataset_name, test_dataset_name, module_path=''):
     # preprocessing of the train/validation tweets, then test tweets
     tweets, classes = format_training_file(dataset_name=train_dataset_name, module_path=module_path)
     tweets_test, y_test = format_test_file(dataset_name=test_dataset_name, module_path=module_path)
     print("file loaded and formatted..")
-    train_val_split_tocsv(tweets, classes, val_size=0.2, module_path=module_path, dataset_name=train_dataset_name)
-    test_tocsv(tweets_test, y_test, module_path=module_path, dataset_name=test_dataset_name)
+    train_csv_name, val_csv_name = train_val_split_tocsv(tweets, classes, val_size=0.2, module_path=module_path, dataset_name=train_dataset_name)
+    test_csv_name = test_tocsv(tweets_test, y_test, module_path=module_path, dataset_name=test_dataset_name)
     print("data split into train/val/test")
+    return(train_csv_name, val_csv_name, test_csv_name)
 
+def get_datasets(train_dataset_name, test_dataset_name, model_type, fix_length=None, module_path=''):
     field, tokenizer, label, train_data, val_data, test_data = create_fields_dataset(model_type, fix_length, 
                                                                                      module_path=module_path, 
                                                                                      train_dataset_name=train_dataset_name, 

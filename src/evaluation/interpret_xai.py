@@ -13,6 +13,7 @@ import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 from preprocess_utils import *
+from src.utils.preprocess_utils import create_formatted_csvs
 from train import train_model, test_model
 from models import BasicLSTM, BiLSTM
 
@@ -184,6 +185,7 @@ if __name__ == '__main__':
 
     print("Device:", device)
 
+    create_formatted_csvs(training_data, testset_data)
     field, tokenizer, train_data, val_data, test_data = get_datasets(training_data, testset_data, test_labels_data)
 
     vocab_stoi, vocab_itos = get_vocab_stoi_itos(field)

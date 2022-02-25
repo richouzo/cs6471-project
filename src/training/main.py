@@ -11,7 +11,7 @@ import torch
 from torch import optim
 import torch.nn as nn
 
-from src.utils.preprocess_utils import get_datasets, get_dataloaders
+from src.utils.preprocess_utils import create_formatted_csvs, get_datasets, get_dataloaders
 from src.training.train_utils import train_model, test_model
 
 from src.utils.utils import load_model, save_model, plot_training, plot_cm, classif_report
@@ -200,6 +200,7 @@ if __name__ == '__main__':
     print("Training dataset:", train_dataset_name)
     print("Test dataset:", test_dataset_name)
 
+    create_formatted_csvs(train_dataset_name, test_dataset_name)
     field, tokenizer, train_data, val_data, test_data = get_datasets(train_dataset_name, test_dataset_name, model_type, fix_length)
 
     dataloaders = get_dataloaders(train_data, val_data, test_data, batch_size, device)
