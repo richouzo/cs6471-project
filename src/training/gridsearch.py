@@ -27,7 +27,7 @@ def get_gridsearch_config(config_path):
 
     return all_config_list
 
-def gridsearch(config_path, training_data, testset_data, test_labels_data, do_save, device):
+def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, device):
     all_config_list = get_gridsearch_config(config_path)
 
     training_remaining = np.prod([len(config) for config in all_config_list])
@@ -36,7 +36,9 @@ def gridsearch(config_path, training_data, testset_data, test_labels_data, do_sa
     # Save gridsearch training to csv
     current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     csv_path = GRIDSEARCH_CSV+'results_{}.csv'.format(current_time)
-    results_dict = {'model_type': [], 
+    results_dict = {'model_type': [],
+                    'train_dataset': [],
+                    'test_dataset': [], 
                     'optimizer_type': [], 
                     'loss_criterion': [], 
                     'lr': [], 
@@ -70,14 +72,13 @@ def gridsearch(config_path, training_data, testset_data, test_labels_data, do_sa
             print("prev_model_type", prev_model_type)
             print("model_type", model_type)
             print("Changing tokenizer...")
-            ENGLISH, tokenizer, train_data, val_data, test_data = get_datasets(training_data, 
-                                                                               testset_data, test_labels_data, 
+            ENGLISH, tokenizer, train_data, val_data, test_data = get_datasets(train_dataset_name, test_dataset_name, 
                                                                                model_type, fix_length)
             prev_model_type = model_type
 
         print('fix_length:', fix_length)
         print('batch_size:', batch_size)
-        
+
         if model_type == 'PyramidCNN':
             print('context_size:', context_size)
             print('pyramid:', pyramid)
@@ -100,6 +101,10 @@ def gridsearch(config_path, training_data, testset_data, test_labels_data, do_sa
         for key in results_dict.keys():
             if key in ['train_loss', 'val_loss', 'train_acc', 'val_acc']:
                 results_dict[key].append(history_training[key][best_epoch])
+            elif key == 'train_dataset':
+                results_dict[key].append(train_dataset_name)
+            elif key == 'test_dataset':
+                results_dict[key].append(test_dataset_name)
             elif key == 'epochs':
                 results_dict[key].append(epochs)
             elif key == 'batch_size':
@@ -118,9 +123,8 @@ def gridsearch(config_path, training_data, testset_data, test_labels_data, do_sa
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--training_data", help="unprocessed OLID training dataset", default="data/training_data/offenseval-training-v1.tsv")
-    parser.add_argument("--testset_data", help="unprocessed OLID testset dataset", default="data/test_data/testset-levela.tsv")
-    parser.add_argument("--test_labels_data", help="unprocessed OLID test labels dataset", default="data/test_data/labels-levela.csv")
+    parser.add_argument("--train_dataset_name", help="Training dataset", default="offenseval")
+    parser.add_argument("--test_dataset_name", help="Test dataset", default="offenseval")
     parser.add_argument("--config_path", help="gridsearch config", default="gridsearch_config.yml")
     parser.add_argument("--do_save", default=1, help="1 for saving stats and figures, else 0", type=int)
     parser.add_argument("--device", default='' , help="cpu or cuda for gpu")
@@ -128,9 +132,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Data processing
-    training_data = args.training_data
-    testset_data = args.testset_data
-    test_labels_data = args.test_labels_data
+    train_dataset_name = args.train_dataset_name
+    test_dataset_name = args.test_dataset_name
     config_path = args.config_path
 
     # Hyperparameters
@@ -143,4 +146,4 @@ if __name__ == '__main__':
 
     print("Device:", device)
 
-    gridsearch(config_path, training_data, testset_data, test_labels_data, do_save, device)
+    gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, device)

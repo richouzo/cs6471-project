@@ -17,22 +17,32 @@ from sklearn.model_selection import train_test_split
 
 import transformers
 
+dict_dataset_name_unprocessed = {'offenseval': {'train': 'data/training_data/offenseval-training-v1.tsv',\
+                                 'test': 'data/test_data/testset-levela.tsv', 'test_labels': 'data/test_data/labels-levela.csv'}, 
+                                 'covidhate' : {'train': '',\
+                                 'test': ''},
+                                 'SBF' : {'train': 'data/training_data/SBFv2_training.tsv',\
+                                 'test': 'data/test_data/SBFv2_test.tsv'},
+                                 'implicithate' : {'train': 'data/training_data/implicit_hate_v1_stg1_posts_training.tsv',\
+                                 'test': 'data/test_data/implicit_hate_v1_stg1_posts_test.tsv'}
+                                 }
 
-dict_dataset_name = {'offenseval': {'train': 'data/offenseval_train.csv',\
-     'val': 'data/offenseval_val.csv', 'test': 'data/offenseval_test.csv'}, 
-     'covidhate' : {'train': 'data/covidhate_train.csv',\
-     'val': 'data/covidhate_val.csv', 'test': 'data/covidhate_test.csv'},
-     'SBF' : {'train': 'data/SBF_train.csv',\
-     'val': 'data/SBF_val.csv', 'test': 'data/SBF_test.csv'},
-     'implicithate' : {'train': 'data/implicithate_train.csv',\
-     'val': 'data/implicithate_val.csv', 'test': 'data/implicithate_test.csv'}
-     }
+dict_dataset_name_processed = {'offenseval': {'train': 'data/offenseval_train.csv',\
+                               'val': 'data/offenseval_val.csv', 'test': 'data/offenseval_test.csv'}, 
+                               'covidhate' : {'train': 'data/covidhate_train.csv',\
+                               'val': 'data/covidhate_val.csv', 'test': 'data/covidhate_test.csv'},
+                               'SBF' : {'train': 'data/SBF_train.csv',\
+                               'val': 'data/SBF_val.csv', 'test': 'data/SBF_test.csv'},
+                               'implicithate' : {'train': 'data/implicithate_train.csv',\
+                               'val': 'data/implicithate_val.csv', 'test': 'data/implicithate_test.csv'}
+                               }
 
-def format_training_file(text_file, module_path='', dataset_name=''):
+def format_training_file(dataset_name='', module_path=''):
+    # TODO Remove this function and preprocess the datasets to tsv before the training pipeline
     tweets = []
     classes = []
     if dataset_name == 'offenseval':
-        for line in open(module_path+text_file,'r',encoding='utf-8'):
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
             line = re.sub(r'http.*[^ ]', 'URL', line)
@@ -47,7 +57,7 @@ def format_training_file(text_file, module_path='', dataset_name=''):
         pass
 
     elif dataset_name == 'SBF':
-        for line in open(module_path+text_file,'r',encoding='utf-8'):
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
             line = re.sub(r'http.*[^ ]', 'URL', line)
@@ -63,8 +73,8 @@ def format_training_file(text_file, module_path='', dataset_name=''):
                 tweets.append(message)
                 classes.append(line[4])
 
-    else:
-        for line in open(module_path+text_file,'r',encoding='utf-8'):
+    elif dataset_name == 'implicithate':
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
             line = re.sub(r'http.*[^ ]', 'URL', line)
@@ -76,9 +86,7 @@ def format_training_file(text_file, module_path='', dataset_name=''):
             if len(line) >= 3:
                 tweets.append(line[1])
                 classes.append(int(line[2] in hate_labels))
-            
-    
-    # print(len(tweets), len(classes))
+
     return tweets[1:], classes[1:]
 
 def train_val_split_tocsv(tweets, classes, val_size=0.2, module_path='', dataset_name=''):
@@ -87,15 +95,16 @@ def train_val_split_tocsv(tweets, classes, val_size=0.2, module_path='', dataset
     df_train = pd.DataFrame({'text': tweets_train, 'label': y_train})
     df_val = pd.DataFrame({'text': tweets_val, 'label': y_val})
 
-    df_train.to_csv(module_path+dict_dataset_name[dataset_name]['train'], index=False)
-    df_val.to_csv(module_path+dict_dataset_name[dataset_name]['val'], index=False)
+    df_train.to_csv(module_path+dict_dataset_name_processed[dataset_name]['train'], index=False)
+    df_val.to_csv(module_path+dict_dataset_name_processed[dataset_name]['val'], index=False)
 
-def format_test_file(text_file_testset, text_file_labels, module_path='', dataset_name=''):
+def format_test_file(dataset_name='', module_path=''):
+    # TODO Remove this function and preprocess the datasets to tsv before the training pipeline
     tweets_test = []
     y_test = []
-    
+
     if dataset_name == 'offenseval':
-        for line in open(module_path+text_file_testset,'r',encoding='utf-8'):
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
             line = re.sub(r'http.*[^ ]', 'URL', line)
@@ -104,7 +113,7 @@ def format_test_file(text_file_testset, text_file_labels, module_path='', datase
             line = re.sub(' +', ' ', line)
             line = line.rstrip('\n').split('\t')
             tweets_test.append(line[1])
-        for line in open(module_path+text_file_labels,'r',encoding='utf-8'):
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test_labels'],'r',encoding='utf-8'):
             line = line.rstrip('\n').split('\t')
             y_test.append(int(line[0][-3:]=='OFF'))
 
@@ -112,22 +121,7 @@ def format_test_file(text_file_testset, text_file_labels, module_path='', datase
         pass
 
     elif dataset_name == 'SBF':
-        for line in open(module_path+text_file_testset,'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split(',')
-            offensive = set(['1', '1.0', '0', '0.0'])
-            if len(line) >= 18 and line[4] in offensive:
-                message = ""
-                for i in range(14, len(line) - 3):
-                    message += line[i]
-                tweets_test.append(message)
-                y_test.append(line[4])
-        for line in open(module_path+text_file_labels,'r',encoding='utf-8'):
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
             line = re.sub(r'http.*[^ ]', 'URL', line)
@@ -143,10 +137,9 @@ def format_test_file(text_file_testset, text_file_labels, module_path='', datase
                 tweets_test.append(message)
                 y_test.append(line[4])
         return tweets_test[1:], y_test[1:]
-            
 
-    else:
-        for line in open(module_path+text_file_testset,'r',encoding='utf-8'):
+    elif dataset_name == 'implicithate':
+        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
             line = re.sub(r'http.*[^ ]', 'URL', line)
@@ -160,14 +153,13 @@ def format_test_file(text_file_testset, text_file_labels, module_path='', datase
                 y_test.append(int(line[2] in hate_labels))
         return tweets_test[1:], y_test[1:]
 
-    # print(len(tweets_test), len(y_test))
     return tweets_test[1:], y_test
 
 def test_tocsv(tweets_test, y_test, module_path='', dataset_name = ''):
     df_test = pd.DataFrame({'text': tweets_test, 'label': y_test})
-    df_test.to_csv(module_path+dict_dataset_name[dataset_name]['test'], index=False)
+    df_test.to_csv(module_path+dict_dataset_name_processed[dataset_name]['test'], index=False)
 
-def create_fields_dataset(model_type, fix_length=None, module_path='', dataset_name = ''):
+def create_fields_dataset(model_type, fix_length=None, module_path='', train_dataset_name='', test_dataset_name=''):
     tokenizer = None
     if model_type == "DistillBert":
         tokenizer = transformers.DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
@@ -192,16 +184,16 @@ def create_fields_dataset(model_type, fix_length=None, module_path='', dataset_n
     print("field objects created")
     train_data, val_data = TabularDataset.splits(
         path = '',
-        train=module_path+dict_dataset_name[dataset_name]['train'],
-        test=module_path+dict_dataset_name[dataset_name]['val'],
+        train=module_path+dict_dataset_name_processed[train_dataset_name]['train'],
+        test=module_path+dict_dataset_name_processed[train_dataset_name]['val'],
         format='csv',
         fields=fields,
         skip_header=True,
     )
     _, test_data = TabularDataset.splits(
         path = '',
-        train=module_path+dict_dataset_name[dataset_name]['train'],
-        test=module_path+dict_dataset_name[dataset_name]['test'],
+        train=module_path+dict_dataset_name_processed[test_dataset_name]['train'],
+        test=module_path+dict_dataset_name_processed[test_dataset_name]['test'],
         format='csv',
         fields=fields,
         skip_header=True,
@@ -229,17 +221,19 @@ def get_vocab_stoi_itos(field, tokenizer=None):
         vocab_itos = field.vocab.itos
     return (vocab_stoi, vocab_itos)
 
-def get_datasets(training_data, testset_data, test_labels_data, model_type, fix_length=None, module_path='', dataset_name=''):
+def get_datasets(train_dataset_name, test_dataset_name, model_type, fix_length=None, module_path=''):
     # preprocessing of the train/validation tweets, then test tweets
-    tweets, classes = format_training_file(training_data, module_path=module_path, dataset_name=dataset_name)
-    tweets_test, y_test = format_test_file(testset_data, test_labels_data, module_path=module_path, dataset_name=dataset_name)
+    tweets, classes = format_training_file(dataset_name=train_dataset_name, module_path=module_path)
+    tweets_test, y_test = format_test_file(dataset_name=test_dataset_name, module_path=module_path)
     print("file loaded and formatted..")
-    train_val_split_tocsv(tweets, classes, val_size=0.2, module_path=module_path, dataset_name=dataset_name)
-    test_tocsv(tweets_test, y_test, module_path=module_path, dataset_name=dataset_name)
+    train_val_split_tocsv(tweets, classes, val_size=0.2, module_path=module_path, dataset_name=train_dataset_name)
+    test_tocsv(tweets_test, y_test, module_path=module_path, dataset_name=test_dataset_name)
     print("data split into train/val/test")
 
     field, tokenizer, label, train_data, val_data, test_data = create_fields_dataset(model_type, fix_length, 
-                                                                                     module_path=module_path, dataset_name=dataset_name)
+                                                                                     module_path=module_path, 
+                                                                                     train_dataset_name=train_dataset_name, 
+                                                                                     test_dataset_name=test_dataset_name)
 
     # build vocabularies using training set
     print("fields and dataset object created")

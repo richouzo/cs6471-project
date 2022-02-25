@@ -136,9 +136,8 @@ def main(dataloaders, field, model_type, optimizer_type, loss_criterion, lr,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--training_data", help="unprocessed OLID training dataset", default="data/training_data/offenseval-training-v1.tsv")
-    parser.add_argument("--testset_data", help="unprocessed OLID testset dataset", default="data/test_data/testset-levela.tsv")
-    parser.add_argument("--test_labels_data", help="unprocessed OLID test labels dataset", default="data/test_data/labels-levela.csv")
+    parser.add_argument("--train_dataset_name", help="Training dataset", default="SBF")
+    parser.add_argument("--test_dataset_name", help="Test dataset", default="SBF")
     parser.add_argument("--model", help="model to use. Choices are: BasicLSTM, ...", default='BasicLSTM')
     parser.add_argument("--batch_size", help="batch size", type=int, default=128)
     parser.add_argument("--lr", help="learning rate", type=float, default=1e-3)
@@ -162,9 +161,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Data processing
-    training_data = args.training_data
-    testset_data = args.testset_data
-    test_labels_data = args.test_labels_data
+    train_dataset_name = args.train_dataset_name
+    test_dataset_name = args.test_dataset_name
 
     # Hyperparameters
     model_type = args.model
@@ -199,8 +197,10 @@ if __name__ == '__main__':
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     print("Device:", device)
+    print("Training dataset:", train_dataset_name)
+    print("Test dataset:", test_dataset_name)
 
-    field, tokenizer, train_data, val_data, test_data = get_datasets(training_data, testset_data, test_labels_data, model_type, fix_length)
+    field, tokenizer, train_data, val_data, test_data = get_datasets(train_dataset_name, test_dataset_name, model_type, fix_length)
 
     dataloaders = get_dataloaders(train_data, val_data, test_data, batch_size, device)
 
