@@ -57,6 +57,7 @@ def format_training_file(dataset_name='', module_path=''):
         pass
 
     elif dataset_name == 'SBF':
+        offensive = set(['1', '1.0', '0', '0.0'])
         for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
@@ -65,15 +66,13 @@ def format_training_file(dataset_name='', module_path=''):
             line = re.sub(r'(:.*?:)', r' \1 ', line)
             line = re.sub(' +', ' ', line)
             line = line.rstrip('\n').split('\t')
-            offensive = set(['1', '1.0', '0', '0.0'])
             if len(line) >= 18 and line[5] in offensive:
-                message = ""
-                for i in range(15, len(line) - 4):
-                    message += line[i]
+                message = "".join(line[i] for i in range(15, len(line) - 4))
                 tweets.append(message)
                 classes.append(line[5])
 
     elif dataset_name == 'implicithate':
+        hate_labels = set(['implicit_hate', 'explicit_hate'])
         for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
             line = re.sub(r'#([^ ]*)', r'\1', line)
             line = re.sub(r'https.*[^ ]', 'URL', line)
@@ -82,7 +81,6 @@ def format_training_file(dataset_name='', module_path=''):
             line = re.sub(r'(:.*?:)', r' \1 ', line)
             line = re.sub(' +', ' ', line)
             line = line.rstrip('\n').split('\t')
-            hate_labels = set(['implicit_hate', 'explicit_hate'])
             if len(line) >= 3:
                 tweets.append(line[1])
                 classes.append(int(line[2] in hate_labels))
