@@ -88,18 +88,6 @@ def format_training_file(dataset_name='', module_path=''):
     # print("length of tweets, classes", len(tweets), len(classes))
     return tweets[1:], classes[1:]
 
-def train_val_split_tocsv(tweets, classes, val_size=0.2, module_path='', dataset_name=''):
-    tweets_train, tweets_val, y_train, y_val = train_test_split(tweets, classes, test_size=val_size, random_state=42)
-
-    df_train = pd.DataFrame({'text': tweets_train, 'label': y_train})
-    df_val = pd.DataFrame({'text': tweets_val, 'label': y_val})
-
-    train_csv_name = module_path+dict_dataset_name_processed[dataset_name]['train']
-    val_csv_name = module_path+dict_dataset_name_processed[dataset_name]['val']
-    df_train.to_csv(train_csv_name, index=False)
-    df_val.to_csv(val_csv_name, index=False)
-    return (train_csv_name, val_csv_name)
-
 def format_test_file(dataset_name='', module_path=''):
     # TODO Remove this function and preprocess the datasets to tsv before the training pipeline
     tweets_test = []
@@ -156,6 +144,18 @@ def format_test_file(dataset_name='', module_path=''):
         return tweets_test[1:], y_test[1:]
 
     return tweets_test[1:], y_test
+
+def train_val_split_tocsv(tweets, classes, val_size=0.2, module_path='', dataset_name=''):
+    tweets_train, tweets_val, y_train, y_val = train_test_split(tweets, classes, test_size=val_size, random_state=42)
+
+    df_train = pd.DataFrame({'text': tweets_train, 'label': y_train})
+    df_val = pd.DataFrame({'text': tweets_val, 'label': y_val})
+
+    train_csv_name = module_path+dict_dataset_name_processed[dataset_name]['train']
+    val_csv_name = module_path+dict_dataset_name_processed[dataset_name]['val']
+    df_train.to_csv(train_csv_name, index=False)
+    df_val.to_csv(val_csv_name, index=False)
+    return (train_csv_name, val_csv_name)
 
 def test_tocsv(tweets_test, y_test, module_path='', dataset_name = ''):
     df_test = pd.DataFrame({'text': tweets_test, 'label': y_test})
