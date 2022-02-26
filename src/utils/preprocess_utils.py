@@ -1,4 +1,7 @@
 import re
+import time
+import argparse
+
 import emoji
 import numpy as np
 
@@ -254,3 +257,24 @@ def get_dataloaders(train_data, val_data, test_data, batch_size, device):
     dataloaders['test'] = test_iterator
 
     return dataloaders
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset_name", help="Dataset name to preprocess", default="SBF")
+
+    args = parser.parse_args()
+
+    # Data preprocessing
+    dataset_name = args.dataset_name
+
+    start_time = time.time()
+    if dataset_name == 'all':
+        for dataset_name in dict_dataset_name_unprocessed:
+            print("Preprocess {}".format(dataset_name))
+            if dataset_name == 'covidhate': continue # Not implemented yet
+            create_formatted_csvs(dataset_name, dataset_name)
+            print("duration: ", time.time()-start_time)
+            start_time = time.time()
+    else:
+        create_formatted_csvs(dataset_name, dataset_name)
+        print("duration: ", time.time()-start_time)

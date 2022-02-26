@@ -21,6 +21,15 @@ For this study, we use the sub-task A of the OLID Dataset. This dataset contains
 
 Preprocessing functions can be found in [preprocess_utils.py](src/utils/preprocess_utils.py).
 
+## Preprocessing phase
+
+Before attempting the training phase, please use this command to preprocess the data:
+
+```bash
+### Start preprocessing | Default to all dataset
+python -m src.utils.preprocess_utils --dataset_name all
+```
+
 ## Training phase
 
 Please refer to [training.md](docs/training.md).

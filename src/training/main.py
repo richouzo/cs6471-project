@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # Data processing
+    # Load Data
     train_dataset_name = args.train_dataset_name
     test_dataset_name = args.test_dataset_name
 
@@ -200,7 +200,6 @@ if __name__ == '__main__':
     print("Training dataset:", train_dataset_name)
     print("Test dataset:", test_dataset_name)
 
-    create_formatted_csvs(train_dataset_name, test_dataset_name)
     field, tokenizer, train_data, val_data, test_data = get_datasets(train_dataset_name, test_dataset_name, model_type, fix_length)
 
     dataloaders = get_dataloaders(train_data, val_data, test_data, batch_size, device)

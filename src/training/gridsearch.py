@@ -1,4 +1,3 @@
-from cgi import test
 import time
 import argparse
 import datetime
@@ -61,7 +60,6 @@ def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, devi
     # Start gridsearch
     prev_model_type = None
     start_time = time.time()
-    create_formatted_csvs(train_dataset_name, test_dataset_name)
     for params in itertools.product(*all_config_list):
         # /!\ Has to be in the same order as in the config.yaml file /!\ #
         model_type, optimizer_type, \
