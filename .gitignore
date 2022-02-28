@@ -1,3 +1,5 @@
+# 4+ GB (ID, label) file
+covid_hate_all_tweets.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
