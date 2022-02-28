@@ -71,8 +71,9 @@ def format_training_file(dataset_name='', module_path=''):
             line = line.rstrip('\n').split('\t')
             if len(line) >= 18 and line[5] in offensive:
                 message = "".join(line[i] for i in range(15, len(line) - 4))
-                tweets.append(message)
-                classes.append(line[5])
+                if len(message) > 0:
+                    tweets.append(message)
+                    classes.append(line[5])
 
     elif dataset_name == 'implicithate':
         hate_labels = set(['implicit_hate', 'explicit_hate'])
@@ -127,8 +128,9 @@ def format_test_file(dataset_name='', module_path=''):
                 message = ""
                 for i in range(15, len(line) - 4):
                     message += line[i]
-                tweets_test.append(message)
-                y_test.append(line[5])
+                if len(message) > 0:
+                    tweets_test.append(message)
+                    y_test.append(line[5])
         return tweets_test[1:], y_test[1:]
 
     elif dataset_name == 'implicithate':
