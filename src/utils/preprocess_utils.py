@@ -40,11 +40,11 @@ dict_dataset_name_processed = {'offenseval': {'train': 'data/offenseval_train.cs
                                'val': 'data/implicithate_val.csv', 'test': 'data/implicithate_test.csv'}
                                }
 
-def clean_line(line: str) -> str:
+def clean_line(line: str) -> list:
     """preprocesses a line of text"""
     line = re.sub(r'#([^ ]*)', r'\1', line)
-    line = re.sub(r'https.*[^ ]', 'URL', line)
-    line = re.sub(r'http.*[^ ]', 'URL', line)
+    line = re.sub(r'https[^\t| ]*', 'URL', line)
+    line = re.sub(r'http[^\t| ]*', 'URL', line)
     line = emoji.demojize(line)
     line = re.sub(r'(:.*?:)', r' \1 ', line)
     line = re.sub(' +', ' ', line)
