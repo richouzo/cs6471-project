@@ -62,7 +62,7 @@ def format_training_file(dataset_name='', module_path=''):
             classes.append(int(line[2]=='OFF'))
         elif dataset_name == 'covidhate':
             tweets.append(line[1])
-            classes.append(line[2])
+            classes.append(line[0])
         elif dataset_name == 'SBF':
             offensive = set(['1', '1.0', '0', '0.0'])
             if len(line) >= 18 and line[5] in offensive:
@@ -96,7 +96,7 @@ def format_test_file(dataset_name='', module_path=''):
             line = clean_line(line)
             if dataset_name == 'covidhate':
                 tweets_test.append(line[1])
-                y_test.append(line[2])
+                y_test.append(line[0])
             elif dataset_name == 'SBF':
                 offensive = set(['1', '1.0', '0', '0.0'])
                 if len(line) >= 18 and line[5] in offensive:
