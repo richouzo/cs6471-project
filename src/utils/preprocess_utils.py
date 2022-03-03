@@ -22,8 +22,8 @@ import transformers
 
 dict_dataset_name_unprocessed = {'offenseval': {'train': 'data/training_data/offenseval-training-v1.tsv',\
                                  'test': 'data/test_data/testset-levela.tsv', 'test_labels': 'data/test_data/labels-levela.csv'}, 
-                                 'covidhate' : {'train': '',\
-                                 'test': ''},
+                                 'covidhate' : {'train': 'data/training_data/covid_hate_training.tsv',\
+                                 'test': 'data/test_data/covid_hate_test.tsv'},
                                  'SBF' : {'train': 'data/training_data/SBFv2_training.tsv',\
                                  'test': 'data/test_data/SBFv2_test.tsv'},
                                  'implicithate' : {'train': 'data/training_data/implicit_hate_v1_stg1_posts_training.tsv',\
@@ -40,51 +40,37 @@ dict_dataset_name_processed = {'offenseval': {'train': 'data/offenseval_train.cs
                                'val': 'data/implicithate_val.csv', 'test': 'data/implicithate_test.csv'}
                                }
 
+def clean_line(line: str) -> list:
+    """preprocesses a line of text"""
+    line = re.sub(r'#([^ ]*)', r'\1', line)
+    line = re.sub(r'https[^\t| ]*', 'URL', line)
+    line = re.sub(r'http[^\t| ]*', 'URL', line)
+    line = emoji.demojize(line)
+    line = re.sub(r'(:.*?:)', r' \1 ', line)
+    line = re.sub(' +', ' ', line)
+    line = line.rstrip('\n').split('\t')
+    return line
+
 def format_training_file(dataset_name='', module_path=''):
     # TODO Remove this function and preprocess the datasets to tsv before the training pipeline
     tweets = []
     classes = []
-    if dataset_name == 'offenseval':
-        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split('\t')
+    for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
+        line = clean_line(line)
+        if dataset_name == 'offenseval':
             tweets.append(line[1])
             classes.append(int(line[2]=='OFF'))
-
-    elif dataset_name == 'covidhate':
-        pass
-
-    elif dataset_name == 'SBF':
-        offensive = set(['1', '1.0', '0', '0.0'])
-        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split('\t')
+        elif dataset_name == 'covidhate':
+            tweets.append(line[1])
+            classes.append(int(line[2].strip('\t')=='2'))
+        elif dataset_name == 'SBF':
+            offensive = set(['1', '1.0', '0', '0.0'])
             if len(line) >= 18 and line[5] in offensive:
                 message = "".join(line[i] for i in range(15, len(line) - 4))
-                if len(message) > 0:
-                    tweets.append(message)
-                    classes.append(line[5])
-
-    elif dataset_name == 'implicithate':
-        hate_labels = set(['implicit_hate', 'explicit_hate'])
-        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['train'],'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split('\t')
+                tweets.append(message)
+                classes.append(line[5])
+        elif dataset_name == 'implicithate':
+            hate_labels = set(['implicit_hate', 'explicit_hate'])
             if len(line) >= 3:
                 tweets.append(line[1])
                 classes.append(int(line[2] in hate_labels))
@@ -99,56 +85,33 @@ def format_test_file(dataset_name='', module_path=''):
 
     if dataset_name == 'offenseval':
         for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test'],'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split('\t')
+            line = clean_line(line)
             tweets_test.append(line[1])
         for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test_labels'],'r',encoding='utf-8'):
             line = line.rstrip('\n').split('\t')
             y_test.append(int(line[0][-3:]=='OFF'))
-
-    elif dataset_name == 'covidhate':
-        pass
-
-    elif dataset_name == 'SBF':
+        return tweets_test[1:], y_test
+    else:
         for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test'],'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split('\t')
-            offensive = set(['1', '1.0', '0', '0.0'])
-            if len(line) >= 18 and line[5] in offensive:
-                message = ""
-                for i in range(15, len(line) - 4):
-                    message += line[i]
-                if len(message) > 0:
+            line = clean_line(line)
+            if dataset_name == 'covidhate':
+                tweets_test.append(line[1])
+                y_test.append(int(line[2].strip('\t')=='2'))
+            elif dataset_name == 'SBF':
+                offensive = set(['1', '1.0', '0', '0.0'])
+                if len(line) >= 18 and line[5] in offensive:
+                    message = ""
+                    for i in range(15, len(line) - 4):
+                        message += line[i]
                     tweets_test.append(message)
                     y_test.append(line[5])
+            elif dataset_name == 'implicithate':
+                hate_labels = set(['implicit_hate', 'explicit_hate'])
+                if len(line) >= 3:
+                    tweets_test.append(line[1])
+                    y_test.append(int(line[2] in hate_labels))
         return tweets_test[1:], y_test[1:]
 
-    elif dataset_name == 'implicithate':
-        for line in open(module_path+dict_dataset_name_unprocessed[dataset_name]['test'],'r',encoding='utf-8'):
-            line = re.sub(r'#([^ ]*)', r'\1', line)
-            line = re.sub(r'https.*[^ ]', 'URL', line)
-            line = re.sub(r'http.*[^ ]', 'URL', line)
-            line = emoji.demojize(line)
-            line = re.sub(r'(:.*?:)', r' \1 ', line)
-            line = re.sub(' +', ' ', line)
-            line = line.rstrip('\n').split('\t')
-            hate_labels = set(['implicit_hate', 'explicit_hate'])
-            if len(line) >= 3:
-                tweets_test.append(line[1])
-                y_test.append(int(line[2] in hate_labels))
-        return tweets_test[1:], y_test[1:]
-
-    return tweets_test[1:], y_test
 
 def train_val_split_tocsv(tweets, classes, val_size=0.2, module_path='', dataset_name=''):
     tweets_train, tweets_val, y_train, y_val = train_test_split(tweets, classes, test_size=val_size, random_state=42)
@@ -253,12 +216,7 @@ def get_dataloaders(train_data, val_data, test_data, batch_size, device):
     _, test_iterator = create_iterators(train_data, test_data, 1, device, shuffle=False)
     print("dataloaders created..")
 
-    dataloaders = {}
-    dataloaders['train'] = train_iterator
-    dataloaders['val'] = val_iterator
-    dataloaders['test'] = test_iterator
-
-    return dataloaders
+    return {'train': train_iterator, 'val': val_iterator, 'test': test_iterator}
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -273,7 +231,6 @@ if __name__ == '__main__':
     if dataset_name == 'all':
         for dataset_name in dict_dataset_name_unprocessed:
             print("Preprocess {}".format(dataset_name))
-            if dataset_name == 'covidhate': continue # Not implemented yet
             create_formatted_csvs(dataset_name, dataset_name)
             print("duration: ", time.time()-start_time)
             start_time = time.time()
