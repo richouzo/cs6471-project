@@ -15,15 +15,15 @@ This dataset contains English tweets annotated using a three-level annotation hi
 
 ## Implicit Hate Speech Dataset (implicit-hate)
 
-[Dataset Paper](https://arxiv.org/abs/2109.05322)
+[Dataset Paper](https://arxiv.org/abs/2109.05322) |
 [Dataset Link](https://github.com/gt-salt/implicit-hate)
 
 ## Racism is a Virus Dataset (covid-hate)
 
-[Dataset Paper](https://arxiv.org/abs/2005.12423)
+[Dataset Paper](https://arxiv.org/abs/2005.12423) |
 [Dataset Link](http://claws.cc.gatech.edu/covid)
 
 ## Social Bias Frames Dataset (SBF)
 
-[Dataset Paper](https://arxiv.org/abs/1911.03891)
+[Dataset Paper](https://arxiv.org/abs/1911.03891) |
 [Dataset Link](https://homes.cs.washington.edu/~msap/social-bias-frames/)
