@@ -1,3 +1,4 @@
+import os
 import re
 import time
 import argparse
@@ -218,21 +219,36 @@ def get_dataloaders(train_data, val_data, test_data, batch_size, device):
 
     return {'train': train_iterator, 'val': val_iterator, 'test': test_iterator}
 
+def preprocessed_datasets_exist(dataset_name):
+    dataset_dict = dict_dataset_name_processed[dataset_name]
+
+    train_path, val_path, test_path = dataset_dict['train'], dataset_dict['val'], dataset_dict['test']
+
+    if os.path.exists(train_path) and os.path.exists(val_path) and os.path.exists(test_path):
+        return True
+    else:
+        return False
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_name", help="Dataset name to preprocess", default="SBF")
+    parser.add_argument("--force_preprocess", help="Force preprocessing", default=0, type=int)
 
     args = parser.parse_args()
 
     # Data preprocessing
     dataset_name = args.dataset_name
+    force_preprocess = args.force_preprocess
 
     start_time = time.time()
     if dataset_name == 'all':
         for dataset_name in dict_dataset_name_unprocessed:
-            print("Preprocess {}".format(dataset_name))
-            create_formatted_csvs(dataset_name, dataset_name)
-            print("duration: ", time.time()-start_time)
+            if not preprocessed_datasets_exist(dataset_name) or force_preprocess:
+                print("Preprocess {}".format(dataset_name))
+                create_formatted_csvs(dataset_name, dataset_name)
+                print("duration: ", time.time()-start_time)
+            else:
+                print("{} preprocessing already done".format(dataset_name))
             start_time = time.time()
     else:
         create_formatted_csvs(dataset_name, dataset_name)
