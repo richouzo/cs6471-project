@@ -20,10 +20,7 @@ FIGURES_PATH = "figures/"
 GRIDSEARCH_CSV = "gridsearch-results/"
 STATS_CSV = "stats-results/"
 
-def load_model(model_type, field, device, 
-               context_size=0, pyramid=[256, 256], 
-               fcs=[128], batch_norm=0, alpha=0.2, 
-               fix_length=None):
+def load_model(model_type, field, device):
     """
     Load and return model.
     """
