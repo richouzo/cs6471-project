@@ -19,8 +19,7 @@ from src.utils.utils import load_model, save_model, plot_training, plot_cm, clas
 def main(dataloaders, field, model_type, optimizer_type, loss_criterion, lr,
          batch_size, epochs, patience_es, do_save, device, do_print=False, 
          scheduler_type='', patience_lr=5,  
-         training_remaining=1, save_condition='acc', fix_length=None,
-         context_size=2, pyramid=[64,128,256], fcs=[64,128], batch_norm=1, alpha=0.2):
+         training_remaining=1, save_condition='acc'):
 
     print('model_type:', model_type)
     print('optimizer_type:', optimizer_type)
@@ -35,9 +34,7 @@ def main(dataloaders, field, model_type, optimizer_type, loss_criterion, lr,
 
 
     # Instantiate model 
-    model = load_model(model_type, field, device, fix_length=fix_length,
-            context_size=context_size, pyramid=pyramid, fcs=fcs,
-            batch_norm=batch_norm, alpha=alpha)
+    model = load_model(model_type, field, device)
 
 
     print("Model {} loaded on {}".format(model_type, device))
@@ -90,8 +87,7 @@ def main(dataloaders, field, model_type, optimizer_type, loss_criterion, lr,
                         'patience_es': patience_es,
                         'scheduler_type': scheduler_type,
                         'patience_lr': patience_lr,
-                        'save_condition': save_condition,
-                        'fix_length': fix_length}
+                        'save_condition': save_condition}
 
 
     ### Training phase ###
@@ -152,11 +148,6 @@ if __name__ == '__main__':
                         " condition on best val_acc (acc) or lowest val_loss(loss)", default='acc')
     parser.add_argument("--device", default='' , help="cpu or cuda for gpu")
     parser.add_argument("--fix_length", default=None, type=int, help="fix length of max number of words per sentence, take max if None")
-    parser.add_argument("--context_size", default=2, type=int, help="")
-    parser.add_argument('--pyramid', default="256", help='delimited list for pyramid input', type=str)
-    parser.add_argument('--fcs', default="128,256", help='delimited list for fcs input', type=str)
-    parser.add_argument("--batch_norm", default=1, type=int, help="")
-    parser.add_argument("--alpha", default=0.8, type=int, help="")
 
     args = parser.parse_args()
 
@@ -181,15 +172,8 @@ if __name__ == '__main__':
     save_condition = args.save_condition
     do_save = args.do_save
 
-    # HybridLSTMCNN
+    # Misc.
     fix_length = args.fix_length
-
-    # PyramidCNN parameters
-    context_size = args.context_size
-    pyramid = [int(item) for item in args.pyramid.split(',')]
-    fcs = [int(item) for item in args.fcs.split(',')]
-    batch_norm = args.batch_norm
-    alpha = args.alpha
 
     if args.device in ['cuda', 'cpu']:
         device = args.device
@@ -206,6 +190,4 @@ if __name__ == '__main__':
 
     main(dataloaders, field, model_type, optimizer_type, loss_criterion, lr, 
          batch_size, epochs, patience_es, do_save, device, do_print=True, save_condition=save_condition, 
-         scheduler_type=scheduler_type, patience_lr=patience_lr, fix_length=fix_length, 
-         context_size=context_size, pyramid=pyramid, fcs=fcs,
-         batch_norm=batch_norm, alpha=alpha)
+         scheduler_type=scheduler_type, patience_lr=patience_lr)
