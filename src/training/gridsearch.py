@@ -31,6 +31,8 @@ def gridsearch(config_path, do_save, device):
     all_config_list = get_gridsearch_config(config_path)
 
     training_remaining = np.prod([len(config) for config in all_config_list])
+    list_datasets = all_config_list[0]
+    training_remaining /= len(list_datasets) # No cross-dataset evaluation for training
     print('Training to do:', training_remaining)
 
     # Save gridsearch training to csv
@@ -59,6 +61,7 @@ def gridsearch(config_path, do_save, device):
 
     # Start gridsearch
     prev_model_type = None
+    prev_train_dataset_name = None
     start_time = time.time()
     for params in itertools.product(*all_config_list):
         # /!\ Has to be in the same order as in the config.yaml file /!\ #
@@ -69,16 +72,24 @@ def gridsearch(config_path, do_save, device):
         scheduler_type, patience_lr, \
         save_condition, fix_length = params
 
-        if prev_model_type != model_type:
+        # No cross-dataset evaluation for training
+        if train_dataset_name != test_dataset_name:
+            continue
+
+        if prev_model_type != model_type or train_dataset_name != prev_train_dataset_name:
             print("prev_model_type", prev_model_type)
             print("model_type", model_type)
+            print("prev_train_dataset_name", prev_train_dataset_name)
+            print("train_dataset_name", train_dataset_name)
             print("Changing tokenizer...")
             ENGLISH, tokenizer, train_data, val_data, test_data = get_datasets(train_dataset_name, test_dataset_name, 
                                                                                model_type, fix_length)
             prev_model_type = model_type
+            prev_train_dataset_name = train_dataset_name
 
         print('fix_length:', fix_length)
         print('batch_size:', batch_size)
+        print("train_dataset_name", train_dataset_name)
 
         dataloaders = get_dataloaders(train_data, val_data, test_data, batch_size, device)
 
