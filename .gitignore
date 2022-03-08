@@ -1,5 +1,8 @@
-# 4+ GB (ID, label) file
+# Data
 covid_hate_all_tweets.csv
+data/*.csv
+data/original_datasets/*.csv
+data/original_datasets/*.tsv
 
 # Results
 figures/
