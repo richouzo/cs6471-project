@@ -11,15 +11,15 @@
 
 Please refer to [install.md](docs/install.md).
 
-## Datasets: Offensive Language Identification Dataset - OLID 
+## Datasets
 
-[Dataset Paper](https://arxiv.org/abs/1902.09666) |
-[Dataset Link1](https://scholar.harvard.edu/malmasi/olid) |
-[Dataset Link2](https://sites.google.com/site/offensevalsharedtask/offenseval2019)
+**Datasets used**:
+- Offensive Language Identification Dataset
+- Implicit Hate Speech Dataset
+- Racism is a Virus Dataset
+- Social Bias Frames Dataset
 
-For this study, we use the sub-task A of the OLID Dataset. This dataset contains English tweets annotated using a three-level annotation hierarchy and was used in the OffensEval challenge in 2019. 
-
-Preprocessing functions can be found in [preprocess_utils.py](src/utils/preprocess_utils.py).
+Please refer to [datasets.md](docs/datasets.md) for more details.
 
 ## Preprocessing phase
 

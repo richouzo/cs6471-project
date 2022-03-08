@@ -1,5 +1,12 @@
 # 4+ GB (ID, label) file
 covid_hate_all_tweets.csv
+
+# Results
+figures/
+gridsearch-results/
+saved-models/
+stats-results/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

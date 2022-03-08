@@ -27,7 +27,7 @@ def get_gridsearch_config(config_path):
 
     return all_config_list
 
-def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, device):
+def gridsearch(config_path, do_save, device):
     all_config_list = get_gridsearch_config(config_path)
 
     training_remaining = np.prod([len(config) for config in all_config_list])
@@ -36,9 +36,9 @@ def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, devi
     # Save gridsearch training to csv
     current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     csv_path = GRIDSEARCH_CSV+'results_{}.csv'.format(current_time)
-    results_dict = {'model_type': [],
-                    'train_dataset': [],
-                    'test_dataset': [], 
+    results_dict = {'train_dataset_name': [],
+                    'test_dataset_name': [], 
+                    'model_type': [],
                     'optimizer_type': [], 
                     'loss_criterion': [], 
                     'lr': [], 
@@ -62,11 +62,12 @@ def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, devi
     start_time = time.time()
     for params in itertools.product(*all_config_list):
         # /!\ Has to be in the same order as in the config.yaml file /!\ #
+        train_dataset_name, test_dataset_name, \
         model_type, optimizer_type, \
         loss_criterion, lr, epochs, \
         batch_size, patience_es, \
         scheduler_type, patience_lr, \
-        save_condition, fix_length, context_size, pyramid, fcs, batch_norm, alpha = params
+        save_condition, fix_length = params
 
         if prev_model_type != model_type:
             print("prev_model_type", prev_model_type)
@@ -79,12 +80,6 @@ def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, devi
         print('fix_length:', fix_length)
         print('batch_size:', batch_size)
 
-        if model_type == 'PyramidCNN':
-            print('context_size:', context_size)
-            print('pyramid:', pyramid)
-            print('fcs:', fcs)
-            print('batch_norm:', batch_norm)
-            print('alpha:', alpha)
         dataloaders = get_dataloaders(train_data, val_data, test_data, batch_size, device)
 
         history_training = main(dataloaders, ENGLISH, model_type, optimizer_type, 
@@ -92,23 +87,23 @@ def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, devi
                                do_save, device, 
                                do_print=False, training_remaining=training_remaining, 
                                scheduler_type=scheduler_type, patience_lr=patience_lr, 
-                               save_condition=save_condition, fix_length=fix_length, 
-                               context_size=context_size, pyramid=pyramid, fcs=fcs,
-                               batch_norm=batch_norm, alpha=alpha)
+                               save_condition=save_condition)
 
         # Save training results to csv
         best_epoch = history_training['best_epoch']
         for key in results_dict.keys():
             if key in ['train_loss', 'val_loss', 'train_acc', 'val_acc']:
                 results_dict[key].append(history_training[key][best_epoch])
-            elif key == 'train_dataset':
+            elif key == 'train_dataset_name':
                 results_dict[key].append(train_dataset_name)
-            elif key == 'test_dataset':
+            elif key == 'test_dataset_name':
                 results_dict[key].append(test_dataset_name)
             elif key == 'epochs':
                 results_dict[key].append(epochs)
             elif key == 'batch_size':
                 results_dict[key].append(batch_size)
+            elif key == 'fix_length':
+                results_dict[key].append(fix_length)
             else:
                 results_dict[key].append(history_training[key])
 
@@ -123,8 +118,6 @@ def gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, devi
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train_dataset_name", help="Training dataset", default="offenseval")
-    parser.add_argument("--test_dataset_name", help="Test dataset", default="offenseval")
     parser.add_argument("--config_path", help="gridsearch config", default="gridsearch_config.yml")
     parser.add_argument("--do_save", default=1, help="1 for saving stats and figures, else 0", type=int)
     parser.add_argument("--device", default='' , help="cpu or cuda for gpu")
@@ -132,8 +125,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Data processing
-    train_dataset_name = args.train_dataset_name
-    test_dataset_name = args.test_dataset_name
     config_path = args.config_path
 
     # Hyperparameters
@@ -146,4 +137,4 @@ if __name__ == '__main__':
 
     print("Device:", device)
 
-    gridsearch(config_path, train_dataset_name, test_dataset_name, do_save, device)
+    gridsearch(config_path, do_save, device)

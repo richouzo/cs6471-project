@@ -1,5 +1,7 @@
 hyperparameters:
   # Training
+  train_dataset_name: ['offenseval']
+  test_dataset_name: ['offenseval']
   model_type: ['BasicLSTM']
   optimizer_type: ['adam']
   loss_criterion: ['bcelosswithlogits']
@@ -15,12 +17,5 @@ hyperparameters:
   # Saving condition by acc or loss
   save_condition: ['acc']
 
-  # HybridLSTMCNN
+  # Misc.
   fix_length: [null]
-
-  # PyramidCNN
-  context_size: [0]
-  pyramid: [[256,256]]
-  fcs: [[128]]
-  batch_norm: [0]
-  alpha: [0.2]
