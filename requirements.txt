@@ -11,3 +11,5 @@ spacy >= 3.2.1
 PyYAML >= 6.0
 emoji >= 1.6.1
 tqdm >= 4.47.0
+gensim >= 4.1.2
+pyLDAvis >= 3.3.1
