@@ -4,6 +4,8 @@
 
 Preprocessing functions can be found in [preprocess_utils.py](src/utils/preprocess_utils.py).
 
+A data analysis of the datasets can be found in [data_analysis.ipynb](src/analysis/data_analysis.ipynb).
+
 ## Offensive Language Identification Dataset - OLID  (offenseval)
 
 [Dataset Paper](https://arxiv.org/abs/1902.09666) |
