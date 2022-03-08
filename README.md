@@ -1,4 +1,4 @@
-# Apples-to-Apples: Comparing the Performance of Hate Speech Detection Models in Context
+# 🍎 Apples-to-Apples: Comparing the Performance of Hate Speech Detection Models in Context
 
 **Context**: Project for [CS6471](https://www.cc.gatech.edu/classes/AY2022/cs6471_spring/) course at Georgia Tech, Spring 2022.
 
