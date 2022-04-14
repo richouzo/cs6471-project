@@ -39,14 +39,14 @@ def main(dataloaders, field, model_type, optimizer_type, loss_criterion, lr,
 
     print("Model {} loaded on {}".format(model_type, device))
 
-    if loss_criterion == 'bceloss':
+    if loss_criterion == 'bceloss': # Not used here
         criterion = nn.BCELoss()
-    elif loss_criterion == 'bcelosswithlogits':
+    elif loss_criterion == 'bcelosswithlogits': # Only for BasicLSTM
         criterion = nn.BCEWithLogitsLoss()
-    elif loss_criterion == 'crossentropy':
+    elif loss_criterion == 'crossentropy': # For all the others models (Transformers)
         criterion = nn.CrossEntropyLoss()
     else: # Default to BCEWithLogitsLoss
-        criterion = nn.BCEWithLogitsLoss()
+        criterion = nn.CrossEntropyLoss()
 
     print('Loss used: {}'.format(criterion))
 
