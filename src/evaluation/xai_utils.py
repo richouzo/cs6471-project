@@ -14,7 +14,6 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 from src.utils.preprocess_utils import *
 from src.training.train_utils import train_model, test_model
-from src.models import BasicLSTM, BiLSTM
 from src.evaluation.test_save_stats import *
 
 from src.utils.utils import *
