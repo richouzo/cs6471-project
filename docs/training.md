@@ -39,9 +39,9 @@ python -m src.training.gridsearch
 | save_condition   | ['loss', 'acc']        |
 | fix_length   | [*null* or *int*]        |
 
-*Note: 
-- For BasicLSTM, please use the loss 'bcelosswithlogits'. 
-- For 'DistillBert' and 'DistillBertEmotion', please use the loss 'crossentropy'*
+*Note:* 
+- *For BasicLSTM, please use the loss 'bcelosswithlogits'.*
+- *For 'DistillBert' and 'DistillBertEmotion', please use the loss 'crossentropy'*
 
 ## Testing
 
