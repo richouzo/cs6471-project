@@ -1,6 +1,7 @@
 import datetime
 import numpy as np
 
+import re
 import torch
 
 import pandas as pd
@@ -99,7 +100,7 @@ def classif_report(hist, list_names=[]):
     target_names = list_names if list_names else [f'class {i}' for i in range(nb_classes)]
     print(classification_report(y_true, y_pred, target_names=target_names))
 
-def plot_cm(hist, model_type, do_save, do_plot=False, do_print=False):
+def plot_cm(hist, model_type, do_save, do_plot=False, do_print=False, model_id=None):
     """
     Plot the confusion matrix after testing.
     """
@@ -107,7 +108,10 @@ def plot_cm(hist, model_type, do_save, do_plot=False, do_print=False):
     y_true = [y for y in hist['y_true']]
 
     nb_classes = len(set(y_true))
-    end_time = hist['end_time']
+    if model_id is None:
+        end_time = hist['end_time']
+    else:
+        end_time = model_id
     cm_path = f"{FIGURES_PATH}{model_type}_CM_{end_time}_testAcc={hist['test_acc']}.png"
 
     cm = confusion_matrix(y_true, y_pred)
@@ -122,3 +126,13 @@ def plot_cm(hist, model_type, do_save, do_plot=False, do_print=False):
         plt.savefig(cm_path)
         if do_print: print(f"Confusion Matrix saved at {cm_path}")
     if do_plot: plt.show()
+
+def get_model_id_from_path(saved_model_path):
+    # Get model_id
+    regex = '\d+-\d+-\d+_\d+-\d+-\d+'
+    find_list = re.findall(regex, saved_model_path)
+    assert len(find_list) > 0, "Cannot find model_id (YYYY-MM-DD_HH-MM-SS) in saved_model_path's filename"
+    model_id = find_list[0]
+    print("model_id:", model_id)
+
+    return model_id
