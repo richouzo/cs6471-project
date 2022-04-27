@@ -6,7 +6,7 @@ Preprocessing functions can be found in [preprocess_utils.py](../src/utils/prepr
 
 A data analysis of the datasets can be found in [data_analysis.ipynb](../src/analysis/data_analysis.ipynb).
 
-## Offensive Language Identification Dataset - OLID  (offenseval)
+## Offensive Language Identification Dataset - OLID  (OffensEval or offenseval)
 
 [Dataset Paper](https://arxiv.org/abs/1902.09666) |
 [Dataset Link1](https://scholar.harvard.edu/malmasi/olid) |
@@ -15,17 +15,19 @@ A data analysis of the datasets can be found in [data_analysis.ipynb](../src/ana
 For this study, we use the sub-task A of the OLID Dataset (Offenseval2019). 
 This dataset contains English tweets annotated using a three-level annotation hierarchy and was used in the OffensEval challenge in 2019. 
 
-## Implicit Hate Speech Dataset (implicit-hate)
+## Implicit Hate Speech Dataset (Implicit Hate or implicithate)
 
 [Dataset Paper](https://arxiv.org/abs/2109.05322) |
 [Dataset Link](https://github.com/gt-salt/implicit-hate)
 
-## Racism is a Virus Dataset (covid-hate)
+## Racism is a Virus Dataset (Covid Hate or covidhate)
 
 [Dataset Paper](https://arxiv.org/abs/2005.12423) |
 [Dataset Link](http://claws.cc.gatech.edu/covid)
 
 ## Social Bias Frames Dataset (SBF)
+
+*Note: We encountered an issue with the SBF dataset during our study. We decided to not use it in our final results.*
 
 [Dataset Paper](https://arxiv.org/abs/1911.03891) |
 [Dataset Link](https://homes.cs.washington.edu/~msap/social-bias-frames/)

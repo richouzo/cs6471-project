@@ -8,6 +8,7 @@ All commands should be used from root directory.
 
 Evaluate models on different domain datasets:
 
+#### BasicLSTM
 ```bash
 # Evaluate BasicLSTM trained on OffensEval dataset
 python -m src.evaluation.test_save_stats --test_dataset_name offenseval --model BasicLSTM --saved_model_path saved-models/BasicLSTM_2022-03-07_18-08-17_trained_testAcc=0.7155.pth --loss_criterion bcelosswithlogits --only_test 1
@@ -33,6 +34,7 @@ python -m src.evaluation.test_save_stats --test_dataset_name implicithate --mode
 python -m src.evaluation.test_save_stats --test_dataset_name covidhate --model BasicLSTM --saved_model_path saved-models/BasicLSTM_2022-03-08_00-37-58_trained_testAcc=0.7278.pth --loss_criterion bcelosswithlogits --only_test 1
 ```
 
+#### DistillBert
 ```bash
 # Evaluate DistillBert trained on OffensEval dataset
 python -m src.evaluation.test_save_stats --test_dataset_name offenseval --model DistillBert --saved_model_path saved-models/DistillBert_2022-04-15_02-48-34_trained_testAcc=0.8026.pth --loss_criterion crossentropy --only_test 1
