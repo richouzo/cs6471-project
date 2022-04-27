@@ -81,7 +81,7 @@ def dataset_visualization(interpret_sentence, lig, visualize_text, model, vocab_
 BERT's XAI methods
 """
 
-def model_explainability_bert(interpret_sentence, lig, model, df, max_samples, device):
+def model_explainability_bert(interpret_sentence, model, tokenizer, ig, df, max_samples, device):
     """
     Computing words importance for each sample in df
     """
@@ -96,18 +96,18 @@ def model_explainability_bert(interpret_sentence, lig, model, df, max_samples, d
         label = df.iloc[idx].true_label
         original_idx = df.iloc[idx].original_index
         with torch.set_grad_enabled(False):
-            interpret_sentence(model, sentence, label, original_idx, vis_data_records_ig, device)
+            interpret_sentence(model, tokenizer, ig, sentence, label, original_idx, vis_data_records_ig, device)
 
     print("Computations completed.")
     return vis_data_records_ig
 
-def dataset_visualization_bert(interpret_sentence, lig, visualize_text, model, df, 
+def dataset_visualization_bert(interpret_sentence, model, tokenizer, ig, visualize_text, df, 
                                device, max_samples=10,partial_vis=False):
     n = len(df)
     if partial_vis:
         n = min(n,max_samples)
 
-    vis_data_record = model_explainability_bert(interpret_sentence, lig, model, df, n, device)
+    vis_data_record = model_explainability_bert(interpret_sentence, model, tokenizer, ig, df, n, device)
 
     print("\n\n**LOADING VISUALIZATION**\n")
     visualize_text(vis_data_record)

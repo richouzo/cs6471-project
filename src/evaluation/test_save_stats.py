@@ -19,14 +19,15 @@ def get_highest_lowest_metric_indexes(stats_df, stats_metric='loss', stats_topk=
 def main_test(dataloaders, phase, field, tokenizer, model_type, csv_path, 
               saved_model_path, loss_criterion, device, only_test=False,
               fix_length=None):
-    from src.utils.utils import load_model, load_trained_model, classif_report
+    from src.utils.utils import load_model, load_trained_model, classif_report, plot_cm, get_model_id_from_path
     from src.training.train_utils import test_model, test_model_and_save_stats
     print()
     print('model_type:', model_type)
     print('loss_criterion:', loss_criterion)
     print()
 
-    # Instanciate model 
+    # Instanciate model
+    model_id = get_model_id_from_path(saved_model_path)
     model = load_model(model_type, field, device)
     model = load_trained_model(model, saved_model_path, device)
 
@@ -55,6 +56,12 @@ def main_test(dataloaders, phase, field, tokenizer, model_type, csv_path,
         stats_df = None
         classif_report(hist=history_training)
 
+        ### Plotting the CM ###
+        plot_cm(hist=history_training, 
+                model_type=model_type, 
+                do_save=True, do_print=True, 
+                model_id=model_id)
+
     else:
         print("Start test and save stats")
         stats_dict = test_model_and_save_stats(model=model, model_type=model_type, loss_criterion=loss_criterion, dataloaders=dataloaders, 
@@ -68,7 +75,6 @@ def main_test(dataloaders, phase, field, tokenizer, model_type, csv_path,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train_dataset_name", help="Training dataset", default="offenseval")
     parser.add_argument("--test_dataset_name", help="Test dataset", default="offenseval")
     parser.add_argument("--model", help="model to use. Choices are: BasicLSTM, ...", default='BasicLSTM')
     parser.add_argument("--saved_model_path", help="path to trained model", default='saved-models/BiLSTM_2021-12-03_23-58-08_trained_testAcc=0.5561.pth')
@@ -82,7 +88,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Data processing
-    train_dataset_name = args.train_dataset_name
     test_dataset_name = args.test_dataset_name
 
     # Hyperparameters
@@ -106,7 +111,7 @@ if __name__ == '__main__':
     stats_topk = args.stats_topk
     stats_label = args.stats_label
 
-    csv_path = STATS_CSV+'stats_{}_{}_{}_{}.csv'.format(model_type, model_id, phase, loss_criterion)
+    csv_path = STATS_CSV+'stats_{}_{}_{}_{}_{}.csv'.format(model_type, model_id, phase, loss_criterion, test_dataset_name)
 
     if not os.path.exists(csv_path) or only_test:
         print("Starting the test pipeline...")
@@ -119,7 +124,7 @@ if __name__ == '__main__':
             device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         print("Device:", device)
 
-        field, tokenizer, train_data, val_data, test_data = get_datasets(train_dataset_name, test_dataset_name, model_type, fix_length)
+        field, tokenizer, train_data, val_data, test_data = get_datasets(test_dataset_name, test_dataset_name, model_type, fix_length)
         dataloaders = get_dataloaders(train_data, val_data, test_data, batch_size, device)
 
         stats_df = main_test(dataloaders, phase, field, tokenizer, model_type, csv_path, 

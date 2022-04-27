@@ -32,5 +32,15 @@ python -m src.utils.preprocess_utils --dataset_name all
 
 ## Training phase
 
-Please refer to [training.md](docs/training.md).
+Please refer to [training.md](docs/training.md) for more details.
+
+## Cross-domain Evaluation phase
+
+Please refer to [evaluation.md](docs/evaluation.md) for more details. 
+
+## Interpretation with XAI phase (Word cloud + Distribution plots)
+
+⚠️ **DISCLAIMER: This part of the study contains words or language that are considered profane, vulgar, or offensive by some readers.** ⚠️
+
+Please refer to [interpret.md](docs/interpret.md) for more details.
 
