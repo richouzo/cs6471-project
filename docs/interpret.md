@@ -57,7 +57,7 @@ Please refer to [Attribution scores notebook](../src/evaluation/attribution_scor
 ## Word importance and word cloud examples on OffensEval
 
 #### Some samples from OffensEval with true positive predictions
-![DistillBert_TP](docs/assets/DistillBert_TP.png)
+![DistillBert_TP](../docs/assets/DistillBert_TP.png)
 
 #### Highest attribution scores words for OffensEval
-![WordCloud_offenseval](docs/assets/high_attrib_wordcloud_2022-04-15_02-48-34_offenseval_offenseval.png)
+![WordCloud_offenseval](../docs/assets/high_attrib_wordcloud_2022-04-15_02-48-34_offenseval_offenseval.png)
