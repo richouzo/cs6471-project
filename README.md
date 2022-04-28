@@ -33,6 +33,8 @@ python -m src.utils.preprocess_utils --dataset_name all
 
 Please refer to [training.md](docs/training.md) for more details.
 
+We provide the trained models [here](https://1drv.ms/u/s!Ak4YJhU8zi9q1jj9lndNDF2ooVfh?e=RTO968). To use them, please put them in the `saved-models/` folder.
+
 ## Cross-domain Evaluation phase
 
 Please refer to [evaluation.md](docs/evaluation.md) for more details. 
