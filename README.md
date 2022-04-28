@@ -17,7 +17,6 @@ Please refer to [install.md](docs/install.md).
 - Offensive Language Identification Dataset
 - Implicit Hate Speech Dataset
 - Racism is a Virus Dataset
-- Social Bias Frames Dataset
 
 Please refer to [datasets.md](docs/datasets.md) for more details.
 
@@ -32,5 +31,17 @@ python -m src.utils.preprocess_utils --dataset_name all
 
 ## Training phase
 
-Please refer to [training.md](docs/training.md).
+Please refer to [training.md](docs/training.md) for more details.
+
+We provide the trained models [here](https://1drv.ms/u/s!Ak4YJhU8zi9q1jj9lndNDF2ooVfh?e=RTO968). To use them, please put them in the `saved-models/` folder.
+
+## Cross-domain Evaluation phase
+
+Please refer to [evaluation.md](docs/evaluation.md) for more details. 
+
+## Interpretation with XAI phase (Word cloud + Distribution plots)
+
+⚠️ **DISCLAIMER: This part of the study contains words or language that are considered profane, vulgar, or offensive by some readers.** ⚠️
+
+Please refer to [interpret.md](docs/interpret.md) for more details.
 
