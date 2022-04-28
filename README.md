@@ -17,7 +17,6 @@ Please refer to [install.md](docs/install.md).
 - Offensive Language Identification Dataset
 - Implicit Hate Speech Dataset
 - Racism is a Virus Dataset
-- Social Bias Frames Dataset
 
 Please refer to [datasets.md](docs/datasets.md) for more details.
 
