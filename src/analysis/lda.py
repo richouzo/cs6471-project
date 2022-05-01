@@ -6,11 +6,11 @@ import gensim
 from gensim.utils import simple_preprocess
 
 
-def get_vectors(lda_model, corpus):
+def get_vectors(lda_model, corpus, k=10):
     vectors = []
     for i in range(len(corpus)):
         top_topics = lda_model.get_document_topics(corpus[i], minimum_probability=0.0)
-        vectors.append([top_topics[i][1] for i in range(10)])
+        vectors.append([top_topics[i][1] for i in range(k)])
     return vectors
 
 
@@ -53,12 +53,12 @@ def get_dict_and_corpus(bigrams):
     return dictionary, corpus
 
 
-def lda_model(dictionary, corpus):
+def lda_model(dictionary, corpus, k=10):
     return gensim.models.ldamodel.LdaModel(
         alpha="auto",
         corpus=corpus,
         id2word=dictionary,
-        num_topics=10,
+        num_topics=k,
         random_state=100,
         update_every=1,
         chunksize=100,
@@ -77,13 +77,13 @@ def coherence(lda_model, dictionary, texts):
     return coherence_model_lda.get_coherence()
 
 
-def lda(df, load_from=None):
+def lda(df, load_from=None, k=10):
     df = create_tokenized_column(df)
     bigrams = create_bigrams(df["tokenized"])
     dictionary, corpus = get_dict_and_corpus(bigrams)
     if load_from:
         lda = gensim.models.ldamodel.LdaModel.load(load_from)
     else:
-        lda = lda_model(dictionary, corpus)
+        lda = lda_model(dictionary, corpus, k)
     coherence_lda = coherence(lda, dictionary, bigrams)
-    return lda, get_vectors(lda, corpus), coherence_lda
+    return lda, get_vectors(lda, corpus, k), coherence_lda
