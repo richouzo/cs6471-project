@@ -10,7 +10,7 @@ nltk == 3.6.6
 spacy == 3.2.1
 PyYAML == 6.0
 emoji == 1.6.1
-tqdm == 4.47.0
+tqdm == 4.66.3
 gensim == 4.1.2
 pyLDAvis == 3.3.1
 wordcloud == 1.8.1
